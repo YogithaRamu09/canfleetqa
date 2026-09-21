@@ -21,7 +21,7 @@ def get_bus():
     which is required here since tests run independently from the
     simulator process.
     """
-    return can.interface.Bus(channel = '224.0.0.1', bustype = 'udp_multicast')
+    return can.interface.Bus(channel = '224.0.0.1', interface = 'udp_multicast')
 
 
 def receive_message(bus, timeout=2):
