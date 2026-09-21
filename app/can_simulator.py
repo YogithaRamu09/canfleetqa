@@ -2,9 +2,12 @@
 can_simulator.py
 
 Simulates a vehicle ECU broadcasting sensor data over a CAN bus.
-Uses python-can's 'virtual' interface so no physical CAN hardware
-is required — this mimics real vehicle telemetry (speed, battery %)
-for testing purposes.
+Uses python-can's 'udp_multicast' interface, which simulates a CAN
+bus over UDP multicast on the local machine. Unlike the 'virtual'
+interface (which only works within a single Python process), this
+lets separate scripts/processes (e.g. this simulator and a test
+runner) send and receive messages from each other — needed since
+our tests run as a separate process from the simulator.
 
 Message ID reference (like a mini DBC):
     0x100 -> Vehicle speed (km/h)
@@ -16,16 +19,17 @@ import random
 
 def create_bus():
     """
-    Creates and returns a virtual CAN bus connection.
+    Creates and returns a CAN bus connection using UDP multicast.
 
-    'channel' is just a shared name — any script using the same
-    channel connects to the same virtual bus, similar to how real
-    ECUs share one physical CAN wire.
+    '224.0.0.1' is a multicast group address — any process on this
+    machine that connects using the same address joins the same
+    simulated bus, similar to how real ECUs share one physical CAN
+    wire. This interface (unlike 'virtual') works across separate
+    processes, which is why we use it here instead.
 
-    'bustype=virtual' tells python-can to simulate the bus in memory
-    instead of looking for real hardware.
+    Requires the 'msgpack' package to serialize messages.
     """
-    return can.interface.Bus(channel = 'test', bustype = 'virtual')
+    return can.interface.Bus(channel = '224.0.0.1', bustype = 'udp_multicast')
 
 def send_speed_message(bus):
     """
