@@ -1,0 +1,50 @@
+# ci.yml
+#
+# GitHub Actions workflow that automatically installs dependencies
+# and runs the test suite every time code is pushed or a pull
+# request is opened against main. This makes the project a
+# real CI/CD pipeline.
+
+name: CANFleetQA CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Pull the repo's code into the CI runner
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python (matches your local version)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Step 3: Install all project dependencies from requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Step 4: Start the CAN simulator in the background (&),
+      # then wait 2 seconds so it's ready before tests connect.
+      - name: Start CAN simulator
+        run: |
+          python app/can_simulator.py &
+          sleep 2
+
+      # Step 5: Start the telemetry API in the background too
+      - name: Start telemetry API
+        run: |
+          python app/telemetry_service.py &
+          sleep 2
+
+      # Step 6: Run the full test suite
+      - name: Run tests
+        run: pytest tests/ -v
