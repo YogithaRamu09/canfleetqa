@@ -12,3 +12,18 @@ Feature: Vehicle telemetry monitoring
         Given the telemetry service is running
         When I request the vehicle battery level
         Then the battery percentage should be between 0 and 100
+
+    Scenario: Battery status is classified correctly
+        Given the battery level is <battery_percent>%
+        When the battery status is evaluated
+        Then the status should be "<expected_status>"
+
+        Examples:
+            | battery_percent  | expected_status |
+            | 100              | Normal          |
+            | 50               | Normal          |
+            | 20               | Normal          |
+            | 19               | Low             |
+            | 10               | Low             |
+            | 9                | Critical        |
+            | 0                | Critical        |

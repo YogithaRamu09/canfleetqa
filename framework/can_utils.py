@@ -52,3 +52,28 @@ def validate_signal_range(value, min_value, max_value, signal_name="signal"):
     belongs in the test, not here.
     """
     return min_value <= value <= max_value
+
+def classify_battery(battery_percent):
+    """
+    Classifies a battery percentage into a status tier, similar to
+    how a real vehicle dashboard would decide what warning to show.
+
+    Tiers:
+        80-100% -> "Normal"
+        20-79%  -> "Normal"   (still fine to drive)
+        10-19%  -> "Low"      (should charge soon)
+        0-9%    -> "Critical" (needs immediate charging)
+
+    Raises ValueError for anything outside 0-100, since that would
+    mean the sensor data itself is invalid - a classification
+    function shouldn't silently accept garbage input.
+    """
+    if not (0 <= battery_percent <= 100):
+        raise ValueError(f"Invalid battery percent: {battery_percent}")
+
+    if battery_percent >= 20:
+        return "Normal"
+    elif battery_percent >= 10:
+        return "Low"
+    else:
+        return "Critical"

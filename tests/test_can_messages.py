@@ -7,6 +7,7 @@ since messages are received over udp_multicast in real time.
 """
 
 import pytest
+from framework.can_utils import classify_battery
 from framework.can_utils import (
     receive_message,
     decode_speed,
@@ -48,3 +49,24 @@ def test_battery_value_within_valid_range(can_bus):
             assert validate_signal_range(battery, 0, 100), f"Battery {battery}% out of range"
             return
     pytest.fail("No battery message received in 10 attempts")
+
+
+@pytest.mark.parametrize("battery_percent, expected_status", [
+    (100, "Normal"),
+    (85, "Normal"),
+    (50, "Normal"),
+    (20, "Normal"),   # boundary - exactly 20 is still Normal
+    (19, "Low"),      # boundary - just under 20
+    (15, "Low"),
+    (10, "Low"),      # boundary - exactly 10 is still Low
+    (9, "Critical"),  # boundary - just under 10
+    (5, "Critical"),
+    (0, "Critical"),
+])
+def test_battery_classification(battery_percent, expected_status):
+    """
+    Runs the same assertion against 10 different battery values.
+    Pytest reports each one as its own separate test result, which
+    makes it easy to see exactly which value (if any) fails.
+    """
+    assert classify_battery(battery_percent) == expected_status
