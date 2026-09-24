@@ -23,23 +23,6 @@ It then automatically validates that data using Pytest — including plain asser
 - **GitHub Actions** — CI pipeline, runs the full suite on every push
 - **pytest-html** — HTML test reports
 
-## Project Structure
-canfleetqa/
-├── app/ # Simulates the vehicle
-│ ├── can_simulator.py  #Broadcasts CAN speed/battery messages
-│ └── telemetry_service.py  #Flask API simulating a vehicle backend
-├── framework/  #Reusable test helpers
-│ ├── can_utils.py  #CAN connect/receive/validate/classify
-│ └── api_client.py #API request wrapper
-├── tests/
-│ ├── conftest.py #Shared Pytest fixtures
-│ ├── test_can_messages.py #CAN bus tests (incl. parametrized)
-│ ├── test_telemetry_api.py #API tests
-│ └── features/ #Gherkin BDD scenarios
-├── .github/workflows/ci.yml #CI pipeline
-└── requirements.txt
-
-
 ## How to Run Locally
 
 1. Clone the repo and set up a virtual environment:
