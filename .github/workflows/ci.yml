@@ -43,7 +43,7 @@ jobs:
       - name: Start telemetry API
         run: |
           python app/telemetry_service.py &
-          sleep 2
+          sleep 3
 
         # Step 6: Run the full test suite and generate an HTML report
       - name: Run tests
