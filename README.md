@@ -37,7 +37,7 @@ It then automatically validates that data using Pytest — including plain asser
 2. Start the simulators (in Git Bash, run in the background):
 ```bash
    python app/can_simulator.py &
-   python app/telemetry_service.py &
+   python -m app.telemetry_service &
 ```
 
 3. Run the tests:
